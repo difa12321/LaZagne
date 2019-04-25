@@ -20,41 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Why to_bufferable?
-# Python 3 is very different from Python 2.x when it comes to strings of text
-# and strings of bytes; in Python 3, strings of bytes do not exist, instead to
-# represent arbitrary binary data, we must use the "bytes" object. This method
-# ensures the object behaves as we need it to.
+# This is a pure-Python implementation of the AES algorithm and AES common
+# modes of operation.
 
-def to_bufferable(binary):
-    return binary
+# See: https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
+# See: https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
 
-def _get_byte(c):
-    return ord(c)
 
-try:
-    xrange
-except NameError:
+# Supported key sizes:
+#   128-bit
+#   192-bit
+#   256-bit
 
-    def to_bufferable(binary):
-        if isinstance(binary, bytes):
-            return binary
-        return bytes(ord(b) for b in binary)
 
-    def _get_byte(c):
-        return c
+# Supported modes of operation:
+#   ECB - Electronic Codebook
+#   CBC - Cipher-Block Chaining
+#   CFB - Cipher Feedback
+#   OFB - Output Feedback
+#   CTR - Counter
 
-def append_PKCS7_padding(data):
-    pad = 16 - (len(data) % 16)
-    return data + to_bufferable(chr(pad) * pad)
+# See the README.md for API details and general information.
 
-def strip_PKCS7_padding(data):
-    if len(data) % 16 != 0:
-        raise ValueError("invalid length")
+# Also useful, PyCrypto, a crypto library implemented in C with Python bindings:
+# https://www.dlitz.net/software/pycrypto/
 
-    pad = _get_byte(data[-1])
 
-    if pad > 16:
-        raise ValueError("invalid padding byte")
+VERSION = [1, 3, 0]
 
-    return data[:-pad]
+from .aes import AES, AESModeOfOperationCTR, AESModeOfOperationCBC, AESModeOfOperationCFB, AESModeOfOperationECB, AESModeOfOperationOFB, AESModesOfOperation, Counter
+from .blockfeeder import decrypt_stream, Decrypter, encrypt_stream, Encrypter
+from .blockfeeder import PADDING_NONE, PADDING_DEFAULT
